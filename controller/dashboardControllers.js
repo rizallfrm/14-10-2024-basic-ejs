@@ -1,3 +1,4 @@
+const { title } = require("process");
 const imagekit = require("../lib/imagekit");
 const { User } = require("../models");
 const fs = require("fs");
@@ -20,6 +21,7 @@ async function usersPage(req, res) {
     //   data: { cars },
     // });
     res.render("users/index", {
+      title: "Users Page",
       users,
     });
   } catch (error) {
@@ -31,17 +33,38 @@ async function usersPage(req, res) {
 
 async function createUser(req, res) {
   const newUser = req.body;
-  try {
-    await User.create({ ...newUser });
+
+  if (req.file) {
+    const file = req.file;
+    console.log(req.file);
+    // processing file
+    const split = file.originalname.split(".");
+    // zal.pdf [zal,pdf]
+    const ext = split[split.length - 1];
+
+    // UPLOAD image to server
+    const uploadImage = await imagekit.upload({
+      file: file.buffer,
+      fileName: `Profile-${Date.now()}.${ext}`,
+    });
+
+    await User.create({ ...newUser, photoProfile: uploadImage });
     res.redirect("/dashboard/admin/users");
-  } catch (error) {
-    res.redirect("/error", {});
+
+    try {
+      await User.create({ ...newUser });
+      res.redirect("/dashboard/admin/users");
+    } catch (error) {
+      res.redirect("/error", {});
+    }
   }
 }
 
 async function createPage(req, res) {
   try {
-    res.render("users/create");
+    res.render("users/create", {
+      title: "Create Pages",
+    });
   } catch (error) {
     res.render("error", {
       message: error.message,
