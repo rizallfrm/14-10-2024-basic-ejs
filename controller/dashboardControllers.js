@@ -20,7 +20,7 @@ async function usersPage(req, res) {
     //   data: { cars },
     // });
     res.render("users/index", {
-      users
+      users,
     });
   } catch (error) {
     res.render("error", {
@@ -29,11 +29,19 @@ async function usersPage(req, res) {
   }
 }
 
+async function createUser(req, res) {
+  const newUser = req.body;
+  try {
+    await User.create({ ...newUser });
+    res.redirect("/dashboard/admin/users");
+  } catch (error) {
+    res.redirect("/error", {});
+  }
+}
+
 async function createPage(req, res) {
   try {
-    res.render("users/create", {
-      
-    });
+    res.render("users/create");
   } catch (error) {
     res.render("error", {
       message: error.message,
@@ -184,7 +192,6 @@ async function createCar(req, res) {
 }
 
 async function createCar(req, res) {
-  
   try {
     for (let i = 0; i < files.length; i++) {
       // Read file from path (because it uses diskStorage)
@@ -218,8 +225,9 @@ async function createCar(req, res) {
 module.exports = {
   createCar,
   usersPage,
-  createPage,
+  createUser,
   getCarById,
   deleteCarById,
   updateCar,
+  createPage,
 };

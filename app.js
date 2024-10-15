@@ -21,6 +21,8 @@ app.use((req, res, next) => {
 
   next();
 });
+// Middleware : agar dari view engine form kebaca (request body) nya
+app.use(express.urlencoded({ extended: false }))
 
 //logging basic
 app.use((req, res, next) => {
